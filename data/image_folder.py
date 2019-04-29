@@ -36,6 +36,18 @@ def default_loader(path):
     return Image.open(path).convert('RGB')
 
 
+def make_dataset_from_list(file_list, max_dataset_size=float("inf")):
+    images = []
+    assert os.path.isfile(file_list), "%s is not a file" % file_list
+
+    with open(file_list) as f:
+        lines = f.read().splitlines()
+    for line in lines:
+        if os.path.exists(line) and is_image_file(os.path.basename(line)):
+            images.append(line)
+    return images[:min(max_dataset_size, len(images))]
+
+
 class ImageFolder(data.Dataset):
 
     def __init__(self, root, transform=None, return_paths=False,

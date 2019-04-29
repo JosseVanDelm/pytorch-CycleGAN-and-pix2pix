@@ -1,19 +1,8 @@
 from data.base_dataset import BaseDataset, get_transform
-from data.image_folder import is_image_file
+from data.image_folder import make_dataset_from_list
 from PIL import Image
 import os.path
-
-
-def make_dataset_from_list(file_list, max_dataset_size=float("inf")):
-    images = []
-    assert os.path.isfile(file_list), "%s is not a file" % file_list
-
-    with open(file_list) as f:
-        lines = f.read().splitlines()
-    for line in lines:
-        if os.path.exists(line) and is_image_file(os.path.basename(line)):
-            images.append(line)
-    return images[:min(max_dataset_size, len(images))]
+import random
 
 
 class UnalignedListDataset(BaseDataset):
@@ -33,8 +22,8 @@ class UnalignedListDataset(BaseDataset):
             opt (Option class) -- stores all the experiment flags; needs to be a subclass of BaseOptions
         """
         BaseDataset.__init__(self, opt)
-        self.train_list_A = os.path.join(opt.dataroot, opt.phase + 'A.txt') # create a path 'path/to/data/trainA.txt'
-        self.train_list_B = os.path.join(opt.dataroot, opt.phase + 'B.txt') # create a path 'path/to/data/trainB.txt'
+        self.train_list_A = os.path.join(opt.dataroot, opt.phase + 'A.txt')  # create a path 'path/to/data/trainA.txt'
+        self.train_list_B = os.path.join(opt.dataroot, opt.phase + 'B.txt')  # create a path 'path/to/data/trainB.txt'
         self.A_paths = sorted(make_dataset_from_list(self.train_list_A, opt.max_dataset_size))
         self.B_paths = sorted(make_dataset_from_list(self.train_list_B, opt.max_dataset_size))
         self.A_size = len(self.A_paths)
